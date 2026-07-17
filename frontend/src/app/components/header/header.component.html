@@ -1,0 +1,42 @@
+<nav class="sticky top-0 z-40 border-b-[3px] border-tuner-orange bg-asphalt/95 backdrop-blur shadow-panel">
+  <div class="mx-auto flex max-w-[1300px] items-center justify-between px-6 py-3.5">
+    <!-- Wordmark -->
+    <a routerLink="/" class="flex items-center gap-2">
+      <span class="flex h-8 w-8 items-center justify-center rounded bg-tuner-orange font-display text-lg text-asphalt">RK</span>
+      <span class="font-display text-2xl tracking-wide text-text-primary">CARTUNE</span>
+    </a>
+
+    <!-- Primary links -->
+    <div class="hidden items-center gap-6 md:flex">
+      <a routerLink="/" class="font-body text-sm text-text-muted hover:text-tuner-orange transition-colors">Showroom</a>
+
+      <ng-container *ngIf="auth.currentUser$ | async as user; else guestLinks">
+        <ng-container *ngIf="user.role === 'admin'; else userLinks">
+          <a routerLink="/admin" class="font-body text-sm text-text-muted hover:text-tuner-orange transition-colors">🛠️ Admin Panel</a>
+          <a routerLink="/admin/bookings" class="font-body text-sm text-text-muted hover:text-tuner-orange transition-colors">📅 Bookings</a>
+        </ng-container>
+        <ng-template #userLinks>
+          <a routerLink="/dashboard" class="font-body text-sm text-text-muted hover:text-tuner-orange transition-colors">👤 My Garage</a>
+          <a routerLink="/my-bookings" class="font-body text-sm text-text-muted hover:text-tuner-orange transition-colors">📋 My Bookings</a>
+        </ng-template>
+
+        <div class="flex items-center gap-3 rounded-full border border-line bg-panel px-4 py-1.5">
+          <span class="font-mono text-xs text-text-muted">{{ user.name }}</span>
+          <button (click)="logout()" class="font-mono text-xs uppercase tracking-widest2 text-tuner-orange hover:text-nitro-lime transition-colors">
+            Logout
+          </button>
+        </div>
+      </ng-container>
+
+      <ng-template #guestLinks>
+        <a routerLink="/login" class="font-body text-sm text-text-muted hover:text-tuner-orange transition-colors">🔑 Login</a>
+        <a
+          routerLink="/register"
+          class="rounded-md bg-tuner-orange px-4 py-2 font-body text-sm font-semibold text-asphalt hover:shadow-glow transition-shadow"
+        >
+          🏁 Join the Club
+        </a>
+      </ng-template>
+    </div>
+  </div>
+</nav>

@@ -1,0 +1,180 @@
+<div class="mx-auto max-w-6xl px-6 py-12">
+  <div class="flex items-center justify-between">
+    <div>
+      <p class="font-mono text-xs uppercase tracking-widest2 text-tuner-orange">Admin</p>
+      <h1 class="mt-1 font-display text-4xl uppercase tracking-wide text-text-primary">Manage Inventory</h1>
+    </div>
+    <button (click)="openCreate()" class="rounded-md bg-tuner-orange px-5 py-2.5 font-body text-sm font-semibold text-asphalt hover:shadow-glow transition-shadow">
+      + Add Vehicle
+    </button>
+  </div>
+
+  <div *ngIf="loading" class="mt-8 skeleton h-64 rounded-lg"></div>
+
+  <div *ngIf="!loading" class="mt-8 overflow-hidden rounded-lg border border-line">
+    <table class="w-full text-left">
+      <thead class="bg-panel">
+        <tr class="font-mono text-[11px] uppercase tracking-widest2 text-text-muted">
+          <th class="px-4 py-3">Vehicle</th>
+          <th class="px-4 py-3">Price</th>
+          <th class="px-4 py-3">Year</th>
+          <th class="px-4 py-3">Status</th>
+          <th class="px-4 py-3 text-right">Actions</th>
+        </tr>
+      </thead>
+      <tbody class="divide-y divide-line bg-panel/50">
+        <tr *ngFor="let car of cars">
+          <td class="px-4 py-3">
+            <div class="flex items-center gap-3">
+              <img [src]="thumbnail(car)" class="h-10 w-14 rounded object-cover" [alt]="car.carName" />
+              <div>
+                <p class="font-body text-sm text-text-primary">{{ car.brand }} {{ car.carName }}</p>
+                <p class="font-mono text-[10px] text-text-muted">{{ car.kmDriven | number }} km · {{ car.fuelType }}</p>
+              </div>
+            </div>
+          </td>
+          <td class="px-4 py-3 font-mono text-sm text-nitro-lime">₹{{ car.price | number }}</td>
+          <td class="px-4 py-3 font-mono text-sm text-text-muted">{{ car.modelYear }}</td>
+          <td class="px-4 py-3">
+            <span class="rounded-full border border-line px-3 py-1 font-mono text-[10px] uppercase tracking-widest2 text-text-muted">
+              {{ car.status }}
+            </span>
+          </td>
+          <td class="px-4 py-3 text-right">
+            <button (click)="openEdit(car)" class="mr-3 font-mono text-xs uppercase tracking-widest2 text-tuner-orange hover:text-nitro-lime">Edit</button>
+            <button (click)="remove(car)" class="font-mono text-xs uppercase tracking-widest2 text-text-muted hover:text-red-400">Delete</button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- Add/Edit slide-over -->
+<div *ngIf="formOpen" class="fixed inset-0 z-50 flex justify-end bg-asphalt/80 backdrop-blur-sm" (click)="formOpen = false">
+  <div class="h-full w-full max-w-lg overflow-y-auto border-l border-line bg-panel p-6" (click)="$event.stopPropagation()">
+    <h2 class="font-display text-2xl uppercase tracking-wide text-text-primary">
+      {{ editingId ? 'Edit Vehicle' : 'Add Vehicle' }}
+    </h2>
+
+    <div *ngIf="errorMessage" class="mt-4 rounded-md border-l-4 border-tuner-orange bg-tuner-orange/10 px-4 py-3 text-sm text-text-primary">
+      {{ errorMessage }}
+    </div>
+
+    <form [formGroup]="form" (ngSubmit)="save()" class="mt-6 space-y-4">
+      <div>
+        <label class="mb-1 block font-mono text-[11px] uppercase tracking-widest2 text-text-muted">Brand</label>
+        <input formControlName="brand" placeholder="e.g. Hyundai" class="w-full rounded-md border border-line bg-asphalt px-4 py-2.5 text-sm text-text-primary focus:border-tuner-orange focus:outline-none" />
+      </div>
+
+      <div>
+        <label class="mb-1 block font-mono text-[11px] uppercase tracking-widest2 text-text-muted">Model Name</label>
+        <input formControlName="carName" placeholder="e.g. Creta SX" class="w-full rounded-md border border-line bg-asphalt px-4 py-2.5 text-sm text-text-primary focus:border-tuner-orange focus:outline-none" />
+      </div>
+
+      <div class="grid grid-cols-2 gap-3">
+        <div>
+          <label class="mb-1 block font-mono text-[11px] uppercase tracking-widest2 text-text-muted">Model Year</label>
+          <input type="number" formControlName="modelYear" class="w-full rounded-md border border-line bg-asphalt px-4 py-2.5 text-sm text-text-primary focus:border-tuner-orange focus:outline-none" />
+        </div>
+        <div>
+          <label class="mb-1 block font-mono text-[11px] uppercase tracking-widest2 text-text-muted">Price (₹)</label>
+          <input type="number" formControlName="price" class="w-full rounded-md border border-line bg-asphalt px-4 py-2.5 text-sm text-text-primary focus:border-tuner-orange focus:outline-none" />
+        </div>
+      </div>
+
+      <div class="grid grid-cols-2 gap-3">
+        <div>
+          <label class="mb-1 block font-mono text-[11px] uppercase tracking-widest2 text-text-muted">Fuel Type</label>
+          <select formControlName="fuelType" class="w-full rounded-md border border-line bg-asphalt px-4 py-2.5 text-sm text-text-primary focus:border-tuner-orange focus:outline-none">
+            <option *ngFor="let f of fuelTypes" [value]="f">{{ f }}</option>
+          </select>
+        </div>
+        <div>
+          <label class="mb-1 block font-mono text-[11px] uppercase tracking-widest2 text-text-muted">Transmission</label>
+          <select formControlName="transmission" class="w-full rounded-md border border-line bg-asphalt px-4 py-2.5 text-sm text-text-primary focus:border-tuner-orange focus:outline-none">
+            <option *ngFor="let t of transmissions" [value]="t">{{ t }}</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-2 gap-3">
+        <div>
+          <label class="mb-1 block font-mono text-[11px] uppercase tracking-widest2 text-text-muted">KM Driven</label>
+          <input type="number" formControlName="kmDriven" class="w-full rounded-md border border-line bg-asphalt px-4 py-2.5 text-sm text-text-primary focus:border-tuner-orange focus:outline-none" />
+        </div>
+        <div>
+          <label class="mb-1 block font-mono text-[11px] uppercase tracking-widest2 text-text-muted">No. of Owners</label>
+          <input type="number" formControlName="owners" class="w-full rounded-md border border-line bg-asphalt px-4 py-2.5 text-sm text-text-primary focus:border-tuner-orange focus:outline-none" />
+        </div>
+      </div>
+
+      <!-- Photo gallery manager -->
+      <div class="rounded-md border border-line bg-asphalt p-4">
+        <label class="mb-2 block font-mono text-[11px] uppercase tracking-widest2 text-text-muted">Photos</label>
+
+        <!-- Current images -->
+        <div *ngIf="images.length" class="mb-3 grid grid-cols-4 gap-2">
+          <div *ngFor="let img of images; let i = index" class="group relative">
+            <img [src]="previewUrl(img)" class="h-16 w-full rounded object-cover" alt="Car photo" />
+            <button
+              type="button"
+              (click)="removeImage(i)"
+              class="absolute -right-1.5 -top-1.5 flex h-5 w-5 items-center justify-center rounded-full bg-tuner-orange text-[10px] font-bold text-asphalt opacity-0 group-hover:opacity-100 transition-opacity"
+              aria-label="Remove photo"
+            >
+              ✕
+            </button>
+            <span *ngIf="i === 0" class="absolute bottom-0.5 left-0.5 rounded bg-asphalt/80 px-1 font-mono text-[8px] uppercase text-nitro-lime">
+              Cover
+            </span>
+          </div>
+        </div>
+        <p *ngIf="!images.length" class="mb-3 font-body text-xs text-text-muted">No photos added yet.</p>
+
+        <!-- Upload from device -->
+        <label class="mb-2 flex cursor-pointer items-center justify-center rounded-md border border-dashed border-line py-2.5 font-mono text-xs uppercase tracking-widest2 text-text-muted hover:border-tuner-orange hover:text-tuner-orange transition-colors">
+          {{ uploading ? 'Uploading…' : '📤 Upload Photos from Device' }}
+          <input type="file" accept="image/png,image/jpeg,image/webp,image/gif" multiple class="hidden" (change)="onFilesSelected($event)" [disabled]="uploading" />
+        </label>
+
+        <!-- Or paste a URL -->
+        <div class="flex gap-2">
+          <input
+            type="text"
+            [(ngModel)]="newImageUrl"
+            [ngModelOptions]="{ standalone: true }"
+            placeholder="…or paste an image link"
+            class="flex-1 rounded-md border border-line bg-panel px-3 py-2 text-xs text-text-primary placeholder:text-text-muted focus:border-tuner-orange focus:outline-none"
+          />
+          <button type="button" (click)="addImageUrl()" class="rounded-md border border-line px-3 py-2 font-mono text-[10px] uppercase tracking-widest2 text-text-muted hover:text-tuner-orange">
+            Add
+          </button>
+        </div>
+
+        <p *ngIf="uploadError" class="mt-2 font-body text-xs text-tuner-orange">{{ uploadError }}</p>
+      </div>
+
+      <div>
+        <label class="mb-1 block font-mono text-[11px] uppercase tracking-widest2 text-text-muted">Description</label>
+        <textarea formControlName="description" rows="3" placeholder="Any notes for buyers — service history, condition, etc." class="w-full rounded-md border border-line bg-asphalt px-4 py-2.5 text-sm text-text-primary focus:border-tuner-orange focus:outline-none"></textarea>
+      </div>
+
+      <div>
+        <label class="mb-1 block font-mono text-[11px] uppercase tracking-widest2 text-text-muted">Listing Status</label>
+        <select formControlName="status" class="w-full rounded-md border border-line bg-asphalt px-4 py-2.5 text-sm text-text-primary focus:border-tuner-orange focus:outline-none">
+          <option *ngFor="let s of statuses" [value]="s">{{ s }}</option>
+        </select>
+      </div>
+
+      <div class="flex gap-3 pt-2">
+        <button type="submit" class="flex-1 rounded-md bg-tuner-orange py-3 font-body text-sm font-semibold text-asphalt hover:shadow-glow transition-shadow">
+          {{ editingId ? 'Save Changes' : 'Add Vehicle' }}
+        </button>
+        <button type="button" (click)="formOpen = false" class="rounded-md border border-line px-5 py-3 font-body text-sm text-text-muted hover:text-text-primary">
+          Cancel
+        </button>
+      </div>
+    </form>
+  </div>
+</div>

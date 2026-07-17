@@ -1,0 +1,47 @@
+<div class="flex min-h-[80vh] items-center justify-center bg-diagonal-stripes px-4">
+  <div class="w-full max-w-md rounded-xl border border-line bg-panel p-8 shadow-panel">
+    <p class="text-center font-mono text-xs uppercase tracking-widest2 text-tuner-orange">Welcome Back, Driver</p>
+    <h2 class="mt-1 text-center font-display text-3xl uppercase tracking-wide text-text-primary">Start Your Engine</h2>
+    <p class="mt-2 text-center font-body text-sm text-text-muted">Sign in to manage your bookings and garage.</p>
+
+    <div *ngIf="errorMessage" class="mt-5 rounded-md border-l-4 border-tuner-orange bg-tuner-orange/10 px-4 py-3 text-sm text-text-primary">
+      ❌ {{ errorMessage }}
+    </div>
+
+    <form [formGroup]="form" (ngSubmit)="submit()" class="mt-6 space-y-4">
+      <div>
+        <input
+          type="email"
+          formControlName="email"
+          placeholder="Enter Email"
+          class="w-full rounded-md border border-line bg-asphalt px-4 py-3 text-sm text-text-primary placeholder:text-text-muted focus:border-tuner-orange focus:outline-none focus:ring-1 focus:ring-tuner-orange/40"
+        />
+        <p *ngIf="form.get('email')?.touched && form.get('email')?.invalid" class="mt-1 text-xs text-tuner-orange">
+          Enter a valid email address.
+        </p>
+      </div>
+
+      <div>
+        <input
+          type="password"
+          formControlName="password"
+          placeholder="Enter Password"
+          class="w-full rounded-md border border-line bg-asphalt px-4 py-3 text-sm text-text-primary placeholder:text-text-muted focus:border-tuner-orange focus:outline-none focus:ring-1 focus:ring-tuner-orange/40"
+        />
+      </div>
+
+      <button
+        type="submit"
+        [disabled]="submitting"
+        class="w-full rounded-md bg-tuner-orange py-3 font-body text-sm font-semibold text-asphalt hover:shadow-glow transition-shadow disabled:opacity-60"
+      >
+        {{ submitting ? 'Starting…' : 'Login' }}
+      </button>
+    </form>
+
+    <p class="mt-6 text-center font-body text-sm text-text-muted">
+      Don't have an account?
+      <a routerLink="/register" class="font-semibold text-tuner-orange hover:text-nitro-lime transition-colors">Join the Club</a>
+    </p>
+  </div>
+</div>

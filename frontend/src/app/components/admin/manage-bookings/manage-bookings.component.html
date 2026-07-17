@@ -1,0 +1,47 @@
+<div class="mx-auto max-w-5xl px-6 py-12">
+  <p class="font-mono text-xs uppercase tracking-widest2 text-tuner-orange">Admin</p>
+  <h1 class="mt-1 font-display text-4xl uppercase tracking-wide text-text-primary">Manage Bookings</h1>
+
+  <div *ngIf="loading" class="mt-8 space-y-3">
+    <div *ngFor="let s of [1,2,3]" class="skeleton h-20 rounded-lg"></div>
+  </div>
+
+  <div *ngIf="!loading && bookings.length === 0" class="mt-8 rounded-lg border border-dashed border-line py-16 text-center">
+    <p class="font-body text-sm text-text-muted">No booking requests yet.</p>
+  </div>
+
+  <div *ngIf="!loading && bookings.length > 0" class="mt-8 space-y-4">
+    <div *ngFor="let booking of bookings" class="flex items-center gap-4 rounded-lg border border-line bg-panel p-4 shadow-panel">
+      <img [src]="imageFor(booking)" [alt]="booking.car.carName" class="h-16 w-24 rounded object-cover" />
+
+      <div class="flex-1">
+        <h3 class="font-display text-lg uppercase tracking-wide text-text-primary">{{ booking.car.brand }} {{ booking.car.carName }}</h3>
+        <p class="font-mono text-xs text-text-muted">
+          {{ booking.user?.name }} · {{ booking.user?.phone }} · Visit: {{ booking.visitDate | date: 'mediumDate' }}
+        </p>
+        <p *ngIf="booking.message" class="mt-1 font-body text-xs italic text-text-muted">"{{ booking.message }}"</p>
+      </div>
+
+      <span [class]="'rounded-full border px-3 py-1 font-mono text-[10px] uppercase tracking-widest2 ' + statusClass(booking.status)">
+        {{ booking.status }}
+      </span>
+
+      <div class="flex gap-2">
+        <button
+          *ngIf="booking.status === 'pending'"
+          (click)="updateStatus(booking, 'confirmed')"
+          class="rounded-md border border-nitro-lime/40 px-3 py-1.5 font-mono text-[10px] uppercase tracking-widest2 text-nitro-lime hover:bg-nitro-lime/10"
+        >
+          Confirm
+        </button>
+        <button
+          *ngIf="booking.status === 'pending' || booking.status === 'confirmed'"
+          (click)="updateStatus(booking, 'cancelled')"
+          class="rounded-md border border-line px-3 py-1.5 font-mono text-[10px] uppercase tracking-widest2 text-text-muted hover:text-red-400"
+        >
+          Cancel
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

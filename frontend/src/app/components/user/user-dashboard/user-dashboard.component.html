@@ -1,0 +1,35 @@
+<div class="mx-auto max-w-4xl px-6 py-12">
+  <p class="font-mono text-xs uppercase tracking-widest2 text-tuner-orange">My Garage</p>
+  <h1 class="mt-1 font-display text-4xl uppercase tracking-wide text-text-primary">
+    Welcome, {{ auth.currentUser?.name }}
+  </h1>
+
+  <div class="mt-8 grid grid-cols-1 gap-4 sm:grid-cols-2">
+    <a routerLink="/" class="rounded-lg border border-line bg-panel p-6 shadow-panel hover:border-tuner-orange/40 transition-colors">
+      <p class="font-display text-lg uppercase tracking-wide text-text-primary">Browse Showroom</p>
+      <p class="mt-1 font-body text-sm text-text-muted">Explore available second-hand vehicles.</p>
+    </a>
+    <a routerLink="/my-bookings" class="rounded-lg border border-line bg-panel p-6 shadow-panel hover:border-tuner-orange/40 transition-colors">
+      <p class="font-display text-lg uppercase tracking-wide text-text-primary">My Bookings</p>
+      <p class="mt-1 font-body text-sm text-text-muted">Track your requested viewings.</p>
+    </a>
+  </div>
+
+  <div class="mt-10">
+    <h2 class="mb-3 font-mono text-[11px] uppercase tracking-widest2 text-text-muted">Recent Activity</h2>
+
+    <div *ngIf="loading" class="skeleton h-20 rounded-lg"></div>
+
+    <div *ngIf="!loading && recentBookings.length === 0" class="rounded-lg border border-dashed border-line py-8 text-center">
+      <p class="font-body text-sm text-text-muted">No bookings yet — go find your next ride.</p>
+    </div>
+
+    <div *ngFor="let booking of recentBookings" class="mb-3 flex items-center gap-4 rounded-lg border border-line bg-panel p-3">
+      <img [src]="imageFor(booking)" [alt]="booking.car.carName" class="h-14 w-20 rounded object-cover" />
+      <div>
+        <p class="font-body text-sm text-text-primary">{{ booking.car.brand }} {{ booking.car.carName }}</p>
+        <p class="font-mono text-[10px] uppercase tracking-widest2 text-text-muted">{{ booking.status }}</p>
+      </div>
+    </div>
+  </div>
+</div>

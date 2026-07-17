@@ -1,0 +1,65 @@
+<div class="flex min-h-[80vh] items-center justify-center bg-diagonal-stripes px-4 py-10">
+  <div class="w-full max-w-md rounded-xl border border-line bg-panel p-8 shadow-panel">
+    <p class="text-center font-mono text-xs uppercase tracking-widest2 text-tuner-orange">Join the Club</p>
+    <h2 class="mt-1 text-center font-display text-3xl uppercase tracking-wide text-text-primary">Create Your Driver Profile</h2>
+    <p class="mt-2 text-center font-body text-sm text-text-muted">Join RKCartune's trusted buyer community.</p>
+
+    <div *ngIf="errorMessage" class="mt-5 rounded-md border-l-4 border-tuner-orange bg-tuner-orange/10 px-4 py-3 text-sm text-text-primary">
+      ❌ {{ errorMessage }}
+    </div>
+
+    <form [formGroup]="form" (ngSubmit)="submit()" class="mt-6 space-y-4">
+      <input
+        type="text"
+        formControlName="name"
+        placeholder="Full Name"
+        class="w-full rounded-md border border-line bg-asphalt px-4 py-3 text-sm text-text-primary placeholder:text-text-muted focus:border-tuner-orange focus:outline-none focus:ring-1 focus:ring-tuner-orange/40"
+      />
+
+      <input
+        type="email"
+        formControlName="email"
+        placeholder="Email Address"
+        class="w-full rounded-md border border-line bg-asphalt px-4 py-3 text-sm text-text-primary placeholder:text-text-muted focus:border-tuner-orange focus:outline-none focus:ring-1 focus:ring-tuner-orange/40"
+      />
+
+      <div>
+        <input
+          type="password"
+          formControlName="password"
+          placeholder="Password (min 8 chars, upper/lower/number/symbol)"
+          class="w-full rounded-md border border-line bg-asphalt px-4 py-3 text-sm text-text-primary placeholder:text-text-muted focus:border-tuner-orange focus:outline-none focus:ring-1 focus:ring-tuner-orange/40"
+        />
+        <p *ngIf="form.get('password')?.touched && form.get('password')?.invalid" class="mt-1 text-xs text-tuner-orange">
+          Must include uppercase, lowercase, a number, and a special character (min 8 chars).
+        </p>
+      </div>
+
+      <div>
+        <input
+          type="text"
+          formControlName="phone"
+          maxlength="10"
+          placeholder="10-Digit Mobile Number"
+          class="w-full rounded-md border border-line bg-asphalt px-4 py-3 text-sm text-text-primary placeholder:text-text-muted focus:border-tuner-orange focus:outline-none focus:ring-1 focus:ring-tuner-orange/40"
+        />
+        <p *ngIf="form.get('phone')?.touched && form.get('phone')?.invalid" class="mt-1 text-xs text-tuner-orange">
+          Mobile number must be exactly 10 digits.
+        </p>
+      </div>
+
+      <button
+        type="submit"
+        [disabled]="submitting"
+        class="w-full rounded-md bg-tuner-orange py-3 font-body text-sm font-semibold text-asphalt hover:shadow-glow transition-shadow disabled:opacity-60"
+      >
+        {{ submitting ? 'Joining…' : 'Join the Pit Crew' }}
+      </button>
+    </form>
+
+    <p class="mt-6 text-center font-body text-sm text-text-muted">
+      Already a member?
+      <a routerLink="/login" class="font-semibold text-tuner-orange hover:text-nitro-lime transition-colors">Log into your Garage</a>
+    </p>
+  </div>
+</div>

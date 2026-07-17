@@ -1,0 +1,52 @@
+<div *ngIf="car" class="fixed inset-0 z-50 flex items-center justify-center bg-asphalt/80 backdrop-blur-sm p-4" (click)="close.emit()">
+  <div class="w-full max-w-md rounded-xl border border-line bg-panel p-6 shadow-panel" (click)="$event.stopPropagation()">
+    <div class="mb-4 flex items-start justify-between">
+      <div>
+        <p class="font-mono text-[11px] uppercase tracking-widest2 text-tuner-orange">Check Availability</p>
+        <h3 class="font-display text-2xl uppercase tracking-wide text-text-primary">{{ car.brand }} {{ car.carName }}</h3>
+      </div>
+      <button (click)="close.emit()" class="text-text-muted hover:text-tuner-orange" aria-label="Close">
+        <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+        </svg>
+      </button>
+    </div>
+
+    <div *ngIf="successMessage" class="rounded-md border-l-4 border-nitro-lime bg-nitro-lime/10 px-4 py-3 text-sm text-text-primary">
+      ✅ {{ successMessage }}
+    </div>
+
+    <form *ngIf="!successMessage" [formGroup]="form" (ngSubmit)="submit()" class="space-y-4">
+      <div *ngIf="errorMessage" class="rounded-md border-l-4 border-tuner-orange bg-tuner-orange/10 px-4 py-3 text-sm text-text-primary">
+        ❌ {{ errorMessage }}
+      </div>
+
+      <div>
+        <label class="mb-1 block font-mono text-[11px] uppercase tracking-widest2 text-text-muted">Preferred Visit Date</label>
+        <input
+          type="date"
+          formControlName="visitDate"
+          class="w-full rounded-md border border-line bg-asphalt px-4 py-3 text-sm text-text-primary focus:border-tuner-orange focus:outline-none focus:ring-1 focus:ring-tuner-orange/40"
+        />
+      </div>
+
+      <div>
+        <label class="mb-1 block font-mono text-[11px] uppercase tracking-widest2 text-text-muted">Message (optional)</label>
+        <textarea
+          formControlName="message"
+          rows="3"
+          placeholder="Anything you'd like us to know before your visit…"
+          class="w-full rounded-md border border-line bg-asphalt px-4 py-3 text-sm text-text-primary placeholder:text-text-muted focus:border-tuner-orange focus:outline-none focus:ring-1 focus:ring-tuner-orange/40"
+        ></textarea>
+      </div>
+
+      <button
+        type="submit"
+        [disabled]="submitting"
+        class="w-full rounded-md bg-tuner-orange py-3 font-body text-sm font-semibold text-asphalt hover:shadow-glow transition-shadow disabled:opacity-60"
+      >
+        {{ submitting ? 'Submitting…' : 'Request Viewing' }}
+      </button>
+    </form>
+  </div>
+</div>

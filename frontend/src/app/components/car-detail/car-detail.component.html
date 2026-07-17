@@ -1,0 +1,66 @@
+<div class="mx-auto max-w-5xl px-6 py-12">
+  <!-- Loading -->
+  <div *ngIf="loading" class="grid grid-cols-1 gap-8 md:grid-cols-2">
+    <div class="skeleton h-80 rounded-lg"></div>
+    <div class="space-y-3">
+      <div class="skeleton h-6 w-1/2 rounded"></div>
+      <div class="skeleton h-10 w-1/3 rounded"></div>
+      <div class="skeleton h-32 w-full rounded"></div>
+    </div>
+  </div>
+
+  <!-- Error -->
+  <div *ngIf="!loading && errorMessage" class="rounded-lg border border-tuner-orange/30 bg-tuner-orange/5 py-24 text-center">
+    <p class="font-display text-lg uppercase tracking-wide text-tuner-orange">Listing Unavailable</p>
+    <p class="mt-2 text-sm text-text-muted">{{ errorMessage }}</p>
+  </div>
+
+  <!-- Detail -->
+  <div *ngIf="!loading && car" class="grid grid-cols-1 gap-10 md:grid-cols-2">
+    <div>
+      <div class="overflow-hidden rounded-lg border border-line">
+        <img [src]="activeImage" [alt]="car.brand + ' ' + car.carName" class="h-80 w-full object-cover md:h-96" />
+      </div>
+      <div *ngIf="car.images.length > 1" class="mt-3 flex gap-2 overflow-x-auto">
+        <button
+          *ngFor="let img of car.images; let i = index"
+          (click)="selectImage(i)"
+          [class.border-tuner-orange]="activeImageIndex === i"
+          class="h-16 w-20 shrink-0 overflow-hidden rounded border-2 border-transparent transition-colors"
+        >
+          <img [src]="imageUrl(img)" [alt]="car.brand + ' photo ' + (i + 1)" class="h-full w-full object-cover" />
+        </button>
+      </div>
+    </div>
+
+    <div>
+      <p class="font-mono text-xs uppercase tracking-widest2 text-tuner-orange">{{ car.brand }} · {{ car.modelYear }}</p>
+      <h1 class="mt-1 font-display text-4xl uppercase tracking-wide text-text-primary">{{ car.carName }}</h1>
+      <p class="mt-3 font-mono text-3xl text-nitro-lime">₹{{ car.price | number }}</p>
+
+      <div class="mt-5 flex flex-wrap gap-2">
+        <span class="inspection-tag">⛽ {{ car.fuelType }}</span>
+        <span class="inspection-tag">⚙️ {{ car.transmission }}</span>
+        <span class="inspection-tag">🛣️ {{ car.kmDriven | number }} km driven</span>
+        <span class="inspection-tag">👤 {{ car.owners }} owner{{ car.owners > 1 ? 's' : '' }}</span>
+      </div>
+
+      <div class="mt-6 rounded-lg border border-line bg-panel p-5">
+        <h3 class="mb-2 font-mono text-[11px] uppercase tracking-widest2 text-text-muted">Description</h3>
+        <p class="font-body text-sm leading-relaxed text-text-primary/90">
+          {{ car.description || 'No additional description provided for this listing.' }}
+        </p>
+      </div>
+
+      <button
+        (click)="openBooking()"
+        [disabled]="car.status === 'sold'"
+        class="mt-6 w-full rounded-md bg-tuner-orange py-3.5 font-body text-sm font-semibold text-asphalt hover:shadow-glow transition-shadow disabled:opacity-50"
+      >
+        {{ car.status === 'sold' ? 'Sold' : 'Check Availability' }}
+      </button>
+    </div>
+  </div>
+</div>
+
+<app-booking-modal *ngIf="bookingOpen" [car]="car" (close)="bookingOpen = false" (booked)="bookingOpen = false"></app-booking-modal>
