@@ -2,7 +2,9 @@ const express = require('express');
 const mongoose = require('mongoose');
 const Booking = require('../models/Booking');
 const Car = require('../models/Car');
+const User = require('../models/User');
 const { protect, adminOnly } = require('../middleware/auth');
+const { bookingRequestedEmail, bookingStatusUpdatedEmail } = require('../utils/email');
 
 const router = express.Router();
 
@@ -28,6 +30,20 @@ router.post('/', protect, async (req, res) => {
     });
 
     const populated = await booking.populate('car', 'brand carName images price');
+
+    // Notify admins by email — a failed send never blocks the booking itself
+    const admins = await User.find({ role: 'admin' }).select('email');
+    const carLabel = `${car.brand} ${car.carName}`;
+    admins.forEach((admin) => {
+      bookingRequestedEmail({
+        adminEmail: admin.email,
+        userName: req.user.name,
+        userPhone: req.user.phone,
+        carLabel,
+        visitDate,
+      });
+    });
+
     res.status(201).json({ success: true, data: populated });
   } catch (err) {
     res.status(400).json({ success: false, message: 'Failed to create booking', error: err.message });
@@ -68,8 +84,18 @@ router.put('/:id/status', protect, adminOnly, async (req, res) => {
     }
     const booking = await Booking.findByIdAndUpdate(req.params.id, { status }, { new: true })
       .populate('car', 'brand carName')
-      .populate('user', 'name email');
+      .populate('user', 'name email phone');
     if (!booking) return res.status(404).json({ success: false, message: 'Booking not found' });
+
+    if (status === 'confirmed' || status === 'cancelled') {
+      bookingStatusUpdatedEmail({
+        userEmail: booking.user.email,
+        userName: booking.user.name,
+        carLabel: `${booking.car.brand} ${booking.car.carName}`,
+        status,
+      });
+    }
+
     res.json({ success: true, data: booking });
   } catch (err) {
     res.status(500).json({ success: false, message: 'Failed to update booking', error: err.message });
