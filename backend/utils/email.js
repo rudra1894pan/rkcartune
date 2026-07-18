@@ -1,29 +1,17 @@
-const nodemailer = require('nodemailer');
+const { Resend } = require('resend');
 
-let transporter = null;
+let resend = null;
 
-function getTransporter() {
-  if (transporter) return transporter;
+function getClient() {
+  if (resend) return resend;
 
-  if (!process.env.EMAIL_USER || !process.env.EMAIL_PASS) {
-    console.warn('[email] EMAIL_USER/EMAIL_PASS not set — email notifications are disabled.');
+  if (!process.env.RESEND_API_KEY) {
+    console.warn('[email] RESEND_API_KEY not set — email notifications are disabled.');
     return null;
   }
 
-  transporter = nodemailer.createTransport({
-    host: 'smtp.gmail.com',
-    port: 465,
-    secure: true, // true for port 465
-    auth: {
-      user: process.env.EMAIL_USER,
-      pass: process.env.EMAIL_PASS,
-    },
-    connectionTimeout: 10000, // 10 seconds
-    greetingTimeout: 10000,
-    socketTimeout: 10000,
-  });
-
-  return transporter;
+  resend = new Resend(process.env.RESEND_API_KEY);
+  return resend;
 }
 
 /**
@@ -32,16 +20,21 @@ function getTransporter() {
  */
 async function sendEmail({ to, subject, html }) {
   try {
-    const t = getTransporter();
-    if (!t) return;
+    const client = getClient();
+    if (!client) return;
 
-    await t.sendMail({
-      from: `"RKCartune" <${process.env.EMAIL_USER}>`,
+    const { data, error } = await client.emails.send({
+      from: 'RKCartune <onboarding@resend.dev>', // shared Resend domain, works immediately
       to,
       subject,
       html,
     });
-    console.log(`[email] sent "${subject}" to ${to}`);
+
+    if (error) {
+      console.error('[email] send failed:', error.message);
+    } else {
+      console.log(`[email] sent "${subject}" to ${to}`, data.id);
+    }
   } catch (err) {
     console.error('[email] send failed:', err.message);
   }
