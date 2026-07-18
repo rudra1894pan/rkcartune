@@ -10,7 +10,7 @@ const bookingRoutes = require('./routes/bookingRoutes');
 
 const app = express();
 
-app.use(cors({ origin: process.env.CLIENT_ORIGIN || '*' }));
+app.use(cors({ origin: (process.env.CLIENT_ORIGIN || '*').trim() }));
 app.use(express.json());
 app.use(morgan('dev'));
 
