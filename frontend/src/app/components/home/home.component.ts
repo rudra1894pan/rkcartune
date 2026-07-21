@@ -19,6 +19,7 @@ export class HomeComponent implements OnInit {
   activeBrand = '';
   loading = true;
   errorMessage: string | null = null;
+  loadingMessage = 'Waking up the showroom… this can take up to a minute on the first visit.';
 
   searchControl = new FormControl('', { nonNullable: true });
 
@@ -45,6 +46,12 @@ export class HomeComponent implements OnInit {
     this.loading = true;
     this.errorMessage = null;
 
+    const slowLoadTimer = setTimeout(() => {
+      if (this.loading) {
+        this.loadingMessage = 'Still waking up the server… almost there, thanks for your patience.';
+      }
+    }, 8000);
+
     this.carService
       .getCars({ search: this.searchControl.value, brand: this.activeBrand })
       .pipe(
@@ -54,7 +61,9 @@ export class HomeComponent implements OnInit {
         })
       )
       .subscribe((res) => {
+        clearTimeout(slowLoadTimer);
         this.loading = false;
+        this.loadingMessage = 'Waking up the showroom… this can take up to a minute on the first visit.';
         if (res) this.cars = res.data;
       });
   }
